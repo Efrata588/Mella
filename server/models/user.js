@@ -3,9 +3,9 @@ const { match } = require('node:assert')
 const { timeStamp } = require('node:console')
 const { type } = require('node:os')
 
-const userSchema = new mongoose.userSchema({
+const userSchema = new mongoose.Schema({
 
-    fistName:{
+    firstName:{
         type: String, 
         required: true
     },
@@ -73,4 +73,4 @@ const userSchema = new mongoose.userSchema({
 })
 
 
-module.exports = mongoose.Model('User', userSchema)
+module.exports = mongoose.model('User', userSchema)

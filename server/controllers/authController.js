@@ -5,14 +5,14 @@ const { error } = require('node:console')
 
 require('dotenv').config()
 
-const JWT_SECTETE = process.env.JWT_SECTETE
+const JWT_SECRET = process.env.JWT_SECRET
 
 //Registration 
 const Register = async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword, phoneNumber, role } = req.body
 
-        if (!firstName, !lastName, !eamil, !password, !confirmPassword, !phoneNumber, !role ) {
+        if (!firstName, !lastName, !email, !password, !confirmPassword, !phoneNumber, !role ) {
             return res.status(400).json({
                 error: "Please enter all the required feilds."
             })
@@ -24,7 +24,7 @@ const Register = async (req, res) => {
             })
         }
 
-        const phone = /^(\+2519\d{8} | 09\d{d})$/
+        const phone = /^(\+2519\d{8}|09\d{8})$/
 
         if(!phone.test(phoneNumber)){
             return res.status(400).json({
@@ -47,11 +47,11 @@ const Register = async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(10)
-        const hashPassword = await bcrypt.hash(password)
+        const hashPassword = await bcrypt.hash(password, salt)
 
-        const name = firstName + " " + lastName
         const createdUser = await User.create({
-            name,
+            firstName,
+            lastName,
             email: email,
             password: hashPassword,
             phoneNumber,
@@ -92,6 +92,5 @@ const Register = async (req, res) => {
         })
     }
 }
-
 
 module.exports = { Register }
