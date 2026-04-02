@@ -93,4 +93,67 @@ const Register = async (req, res) => {
     }
 }
 
-module.exports = { Register }
+const Login = async (req, res) => {
+    try {
+        const { email, password } = req.body
+
+        if(!email || !password){
+            return res.status(400).json({
+                error: "Please enter all the required feilds."
+            })
+        }
+        
+        if(!JWT_SECRET){
+            return res.status(500).json({
+                error: "JWT secret is not configured"
+            })
+        }
+
+        const user = await User
+            .findOne({ email: email.toLowerCase() })
+            .select('+password')
+
+        if(!user){
+            return res.status(400).json({
+                error: "Invalid email name or password"
+            })
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password) 
+
+        if(!isMatch){
+            return res.status(400).json({
+                error: "Invalid email or password"
+            })
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user._id
+            },
+            JWT_SECRET,
+            {
+                expiresIn: '1h'
+            }
+        )
+
+        return res.status(200).json({
+            message: "Login Successfully",
+            token,
+            user:{
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: user.phoneNumber,
+                role: user.role
+            }
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+module.exports = { Register, Login }

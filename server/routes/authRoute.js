@@ -5,6 +5,7 @@ const { verifyToke } = require('../middlewares/authMiddleware')
 
 
 router.post('/register', authController.Register)
+router.post('/login', authController.Login)
 
 
 module.exports = router
