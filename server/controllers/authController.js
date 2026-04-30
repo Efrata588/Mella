@@ -1,18 +1,21 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const { error } = require('node:console')
+const crypto = require('crypto')
+const nodemailer = require('nodemailer')
+
 
 require('dotenv').config()
 
 const JWT_SECRET = process.env.JWT_SECRET
+
 
 //Registration 
 const Register = async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword, phoneNumber, role } = req.body
 
-        if (!firstName, !lastName, !email, !password, !confirmPassword, !phoneNumber, !role ) {
+        if (!firstName || !lastName || !email || !password || !confirmPassword || !phoneNumber || !role ) {
             return res.status(400).json({
                 error: "Please enter all the required feilds."
             })
@@ -63,7 +66,8 @@ const Register = async (req, res) => {
                 message: 'Account created successfully',
                 user: {
                     id: createdUser._id,
-                    name: createdUser.name,
+                    firstName: createdUser.firstName,
+                    lastName: createdUser.lastName,
                     email: createdUser.email,
                     phoneNumber: createdUser.phoneNumber
                 }
@@ -156,4 +160,86 @@ const Login = async (req, res) => {
     }
 }
 
-module.exports = { Register, Login }
+const ForgetPassword = async (req, res) => {
+    try {
+        
+        const { email } = req.body
+
+        const user = await User.findOne({ email })
+
+        if (!user){
+            return res.status(404).json({
+                error: "User not found"
+            })
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex')
+
+        const hashToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex')
+
+        user.resetPasswordToken = hashToken
+
+        user.resetPasswordExpire = Date.now() + 15 * 60 * 1000
+
+        await user.save({ validateBeforeSave: false })
+        const resetUrl = `http://localhost:3000/reset-password/${resetToken}`
+
+        const treasporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth:{
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        })
+
+        const message = `
+
+            You requested a password reset. 
+
+            Click this link to  reset you password:
+
+            ${resetUrl}
+
+            This link expires in 15 minutes.
+        
+        `
+        await treasporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: 'Password Reset Request',
+            text: message
+        })
+
+
+        res.status(200).json({
+            message: 'Reset email sent'
+        })
+
+
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+}
+
+const VerifyResetCode = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+const ResetPassword = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+module.exports = { Register, Login, ForgetPassword, VerifyResetCode, ResetPassword }

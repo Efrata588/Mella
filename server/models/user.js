@@ -65,7 +65,11 @@ const userSchema = new mongoose.Schema({
     trustScore: {
         type: Number,
         default: 0
-    }
+    },
+
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
+
 
 },
 {
