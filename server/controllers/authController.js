@@ -228,9 +228,41 @@ const ForgetPassword = async (req, res) => {
 
 const VerifyResetCode = async (req, res) => {
     try {
-        
+        const { token } = req.params
+
+        if (!token){
+            return res.status(400).json({
+                error: 'Reset token is required'
+            })
+        }
+
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex')
+
+        const user = User.findOne({
+            resetPasswordToken = hashedToken,
+            resetPasswordExpire = { $gt : Date.now()}
+        })
+
+
+        if(!user){
+            return res.status(400).json({
+                error: 'Invalid or expired reset token'
+            })
+        }
+
+        return res.status(200).json({
+            message: 'Token verified successfully'
+        })
+
+
     } catch (error) {
         
+        return res.status(500).json({
+            error: error.message
+        })
     }
 }
 
