@@ -1,7 +1,4 @@
 const mongoose = require('mongoose')
-const { match } = require('node:assert')
-const { timeStamp } = require('node:console')
-const { type } = require('node:os')
 
 const userSchema = new mongoose.Schema({
 
@@ -68,13 +65,17 @@ const userSchema = new mongoose.Schema({
     },
 
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
 
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
 
-},
-{
-    timeStamp:true
-})
+    loginAttempts: { type: Number, default: 0 },
+    lockUntil: Date,
+
+    refreshToken: String
+
+}, { timestamps: true })
 
 
 module.exports = mongoose.model('User', userSchema)

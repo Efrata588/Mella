@@ -1,28 +1,22 @@
-const jwt = require('jsonwebtoken');
-
-require('dotenv').config();
-
-const JWT_SECRET = process.env.JWT_SECRET;
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 const verifyToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1]
+    if (!token) return res.status(401).json({ error: 'No token provided' })
+
     try {
-        if (!JWT_SECRET) {
-            return res.status(500).json({ message: 'JWT secret is not configured' });
-        }
-
-        const authHeader = req.headers.authorization;
-        const token = authHeader && authHeader.split(' ')[1];
-
-        if (!token) {
-            return res.status(401).json({ message: 'No token provided' });
-        }
-
-        req.user = jwt.verify(token, JWT_SECRET);
-        next();
+        req.user = jwt.verify(token, process.env.JWT_SECRET)
+        next()
     } catch (err) {
-        const status = err.name === 'TokenExpiredError' ? 401 : 403;
-        return res.status(status).json({ message: 'Invalid or expired token' });
+        return res.status(err.name === 'TokenExpiredError' ? 401 : 403).json({ error: 'Invalid or expired token' })
     }
-};
+}
 
-module.exports = verifyToken;
+const requireRole = (...roles) => (req, res, next) => {
+    if (!roles.includes(req.user?.role))
+        return res.status(403).json({ error: 'Access denied' })
+    next()
+}
+
+module.exports = { verifyToken, requireRole }
