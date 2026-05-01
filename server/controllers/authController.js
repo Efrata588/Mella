@@ -267,10 +267,72 @@ const VerifyResetCode = async (req, res) => {
 }
 
 const ResetPassword = async (req, res) => {
+
     try {
-        
+
+        const { token } = req.params
+
+        const { password, confirmPassword } = req.body
+
+        // Validation
+        if (!password || !confirmPassword) {
+            return res.status(400).json({
+                error: 'Please provide password and confirm password'
+            })
+        }
+
+        // Match check
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                error: 'Passwords do not match'
+            })
+        }
+
+        // Hash incoming token
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex')
+
+        // Find user
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpire: { $gt: Date.now() }
+        })
+
+        // Invalid token
+        if (!user) {
+            return res.status(400).json({
+                error: 'Invalid or expired reset token'
+            })
+        }
+
+        // Hash new password
+        const salt = await bcrypt.genSalt(10)
+
+        const hashedPassword =
+            await bcrypt.hash(password, salt)
+
+        // Save new password
+        user.password = hashedPassword
+
+        // Clear reset fields
+        user.resetPasswordToken = undefined
+
+        user.resetPasswordExpire = undefined
+
+        await user.save()
+
+        return res.status(200).json({
+            message: 'Password reset successful'
+        })
+
     } catch (error) {
-        
+
+        return res.status(500).json({
+            error: error.message
+        })
+
     }
 }
 
