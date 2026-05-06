@@ -83,6 +83,13 @@ const getAllProfile = async (req, res) => {
         if(req.query.location) {
             filter.location = req.query.location
         }
+        if (req.query.verified) {
+            filters.verificationStatus = req.query.verified
+        }
+
+        if (req.query.industry) {
+            filters.industriesInterested = req.query.industry
+        }
 
 
         const profiles = await investorService.getAllProfile(

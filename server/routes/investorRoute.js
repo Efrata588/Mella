@@ -6,11 +6,17 @@ const investorController = require('../controllers/investorProfile.controller')
 
 const authMiddleware = require('../middlewares/auth.middleware')
 
+const authorizeRoles = require('../middlewares/role.middleware')
+
+
+
 router.post(
   '/',
   authMiddleware,
   investorController.createInvestorProfile
 )
+
+
 
 router.get(
   '/me',
@@ -18,11 +24,14 @@ router.get(
   investorController.getOwnProfile
 )
 
+
+
 router.put(
   '/me',
   authMiddleware,
   investorController.updateProfile
 )
+
 
 router.delete(
   '/me',
@@ -32,8 +41,20 @@ router.delete(
 
 router.get(
   '/',
-  investorController.getAllProfile
+  authMiddleware,
+  authorizeRoles('admin'),
+  investorController.getAllProfiles
 )
+
+
+
+router.patch(
+  '/verify/:id',
+  authMiddleware,
+  authorizeRoles('admin'),
+  investorController.verifyInvestor
+)
+
 
 router.get(
   '/:id',
