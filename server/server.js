@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoute')
+const investorRoutes = require('./routes/investorRoute')
 const errorHandler = require('./middlewares/errorHandler')
 
 dotenv.config()
@@ -15,6 +16,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)
+app.use('/api/investor', investorRoutes)
 
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }))
 
