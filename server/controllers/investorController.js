@@ -46,17 +46,26 @@ const updateProfile = async (req, res) => {
             updated
         })
     } catch (error) {
-        
+        res.status(500).json({
+            message: error.message
+        })
     }
 }
 
 
 const deleteProfile = async (req, res) => {
-    await investorService.deleteProfile(req.user.id)
+    try {
+        await investorService.deleteProfile(req.user.id)
 
-    res.status(200).json({
-        message: 'Profile deleted successfully'
-    })
+        res.status(200).json({
+            message: 'Profile deleted successfully'
+        })
+
+    }catch(error){
+        res.status(500).json({
+            message: error.message
+        })
+    }
 }
 
 
