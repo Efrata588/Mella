@@ -1,4 +1,4 @@
-const InvestorProfile = require('../models/user')
+const InvestorProfile = require('../models/InvestorProfile')
 
 const createProfile = async (data) => {
     return await InvestorProfile.create(data)
@@ -20,7 +20,7 @@ const updateProfile = async(userId, data) => {
     )
 }
 const deleteProfile = async(userId) => {
-    return await InvestorPrifile.findOneAndDelete({
+    return await InvestorProfile.findOneAndDelete({
         user: userId
     })
 }
@@ -34,11 +34,20 @@ const getProfileById = async(id) => {
 }
 
 
+const verifyInvestor = async (id) => {
+    return await InvestorProfile.findByIdAndUpdate(
+        id,
+        { verificationStatus: 'approved' },
+        { new: true }
+    )
+}
+
 module.exports ={
     createProfile,
     getOwnProfile,
     updateProfile,
     deleteProfile,
     getAllProfile,
-    getProfileById
+    getProfileById,
+    verifyInvestor
 }

@@ -1,12 +1,15 @@
-const investorService = require('../services/investorService')
+const investorService = require('../services/InvestorService')
 
 
 const createInvestorProfile = async (req, res) => {
 
     try {
+        if (!req.user?.userId) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
         const profile = await investorService.createProfile({
             ...req.body,
-            user: req.user.id
+            user: req.user.userId
         })
 
         res.status(200).json({
@@ -14,7 +17,7 @@ const createInvestorProfile = async (req, res) => {
             data: profile
         })
     } catch (error) {
-        res.statsu(500).josn({
+        res.status(500).json({
             message: error.message
         })
     }
@@ -23,7 +26,10 @@ const createInvestorProfile = async (req, res) => {
 
 const getOwnProfile = async (req, res) => {
     try {
-        const profile = await investorService.getOwnProfile(req.user.id)
+        if (!req.user?.userId) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+        const profile = await investorService.getOwnProfile(req.user.userId)
 
         res.status(200).json({
             profile
@@ -37,12 +43,15 @@ const getOwnProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
+        if (!req.user?.userId) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
         const updated = await investorService.updateProfile(
-            req.user.id, 
+            req.user.userId, 
             req.body
         )
 
-        res.status(200).josn({
+        res.status(200).json({
             updated
         })
     } catch (error) {
@@ -55,7 +64,10 @@ const updateProfile = async (req, res) => {
 
 const deleteProfile = async (req, res) => {
     try {
-        await investorService.deleteProfile(req.user.id)
+        if (!req.user?.userId) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+        await investorService.deleteProfile(req.user.userId)
 
         res.status(200).json({
             message: 'Profile deleted successfully'
@@ -84,16 +96,16 @@ const getAllProfile = async (req, res) => {
             filter.location = req.query.location
         }
         if (req.query.verified) {
-            filters.verificationStatus = req.query.verified
+            filter.verificationStatus = req.query.verified
         }
 
         if (req.query.industry) {
-            filters.industriesInterested = req.query.industry
+            filter.industriesInterested = req.query.industry
         }
 
 
         const profiles = await investorService.getAllProfile(
-            filters,
+            filter,
             skip, 
             limit
         )
@@ -126,11 +138,21 @@ const getProfileById = async (req, res) => {
     }
 }
 
+const verifyInvestor = async (req, res) => {
+    try {
+        const profile = await investorService.verifyInvestor(req.params.id)
+        res.status(200).json({ success: true, data: profile })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 module.exports = {
     createInvestorProfile,
     getOwnProfile,
     updateProfile,
     deleteProfile,
     getAllProfile,
-    getProfileById
+    getProfileById,
+    verifyInvestor
 }

@@ -3,7 +3,7 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoute')
-const investorRoutes = require('./routes/authRoute')
+const investorRoutes = require('./routes/investorRoute')
 const errorHandler = require('./middlewares/errorHandler')
 
 dotenv.config()

@@ -1,14 +1,10 @@
 const mongoose = require('mongoose')
-const { kMaxLength } = require('node:buffer')
-const { type } = require('node:os')
 
 const investorProfileSchema = new mongoose.Schema({
 
-    user:{
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
         unique: true
     },
@@ -16,11 +12,11 @@ const investorProfileSchema = new mongoose.Schema({
     investorType:{
         type: String,
         enum: ['Private Equity', 'Corporate Investor', 'Angel Investor'],
-        require: true
+        required: true
     },
     bio:{
         type: String,
-        kMaxLength: 1000
+        maxlength: 1000
     },
     industriesInterested:[
         {
