@@ -68,4 +68,62 @@ const deleteProfile = async (req, res) => {
     }
 }
 
+const getAllProfile = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip = (page - 1) * limit 
 
+        const filter = {}
+
+        if(req.query.investorType) {
+            filter.investorType = req.query.investorType
+        }
+
+        if(req.query.location) {
+            filter.location = req.query.location
+        }
+
+
+        const profiles = await investorService.getAllProfile(
+            filters,
+            skip, 
+            limit
+        )
+
+        res.status(200).json({
+            page, 
+            limit,
+            data: profiles
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+
+const getProfileById = async (req, res) => {
+    try {
+        const profile = await investorService.getProfileById(req.params.id)
+
+        res.status(200).json({
+            profile
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+module.exports = {
+    createInvestorProfile,
+    getOwnProfile,
+    updateProfile,
+    deleteProfile,
+    getAllProfile,
+    getProfileById
+}
