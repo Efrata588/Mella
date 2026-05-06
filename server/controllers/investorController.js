@@ -35,4 +35,28 @@ const getOwnProfile = async (req, res) => {
     }
 }
 
+const updateProfile = async (req, res) => {
+    try {
+        const updated = await investorService.updateProfile(
+            req.user.id, 
+            req.body
+        )
+
+        res.status(200).josn({
+            updated
+        })
+    } catch (error) {
+        
+    }
+}
+
+
+const deleteProfile = async (req, res) => {
+    await investorService.deleteProfile(req.user.id)
+
+    res.status(200).json({
+        message: 'Profile deleted successfully'
+    })
+}
+
 
