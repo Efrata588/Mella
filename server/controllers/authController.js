@@ -71,10 +71,10 @@ const Register = async (req, res, next) => {
         })
 
         const verifyUrl = `${req.protocol}://${req.get('host')}/api/auth/verify-email/${verificationToken}`
-        await sendEmail(
-            user.email, 
-            'Verify your email', 
-            `Click to verify your account:\n\n${verifyUrl}\n\nExpires in 24 hours.`)
+        // await sendEmail(
+        //     user.email, 
+        //     'Verify your email', 
+        //     `Click to verify your account:\n\n${verifyUrl}\n\nExpires in 24 hours.`)
 
         return res.status(201).json({
             message: 'Account created. Please verify your email.',
