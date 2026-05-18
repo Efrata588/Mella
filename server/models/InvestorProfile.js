@@ -51,8 +51,9 @@ const investorProfileSchema = new mongoose.Schema({
         type: String
     },
     verificationStatus:{
-        type: String,
-        enum: ['pending', 'approved', 'rejected'],
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
     }
 },
 {
